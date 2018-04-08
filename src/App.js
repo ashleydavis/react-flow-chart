@@ -10,9 +10,21 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <div>
+          <svg>
+            <rect
+              class="node-rect"
+              ry="10"
+              rx="10"
+              x="0"
+              y="0"
+              width="150"
+              height="50"
+              fill="gray"
+            >
+            </rect>            
+          </svg>
+        </div>
       </div>
     );
   }
