@@ -2,6 +2,24 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+class Node extends Component {
+  render() {
+    return (
+      <rect
+        class="node-rect"
+        ry="10"
+        rx="10"
+        x="0"
+        y="0"
+        width="150"
+        height="50"
+        fill="gray"
+      >
+      </rect>            
+    );
+  }
+}
+
 class App extends Component {
   render() {
     return (
@@ -12,17 +30,7 @@ class App extends Component {
         </header>
         <div>
           <svg>
-            <rect
-              class="node-rect"
-              ry="10"
-              rx="10"
-              x="0"
-              y="0"
-              width="150"
-              height="50"
-              fill="gray"
-            >
-            </rect>            
+            <Node />
           </svg>
         </div>
       </div>
