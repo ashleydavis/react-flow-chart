@@ -161,12 +161,33 @@ class App extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            node: {
+                x: 120,
+                y: 75,
+            },
+        };
+
         // Interesting pattern for binding your events.
         this.onDragged = this.onDragged.bind(this);
     }
 
     onDragged (x, y) {
         console.log("onDragged: " + x + ", " + y);
+
+        this.setState(
+            {
+                node: {
+                    ...this.state.node, // Preseve existing nested state using the spread operator. This is a bit wierd.
+                    x: x,
+                    y: y,
+                },
+            },
+            () => {
+                console.log("State updated finished");
+                console.log(this.state);
+            }
+        );
     }
 
     render() {
@@ -180,10 +201,10 @@ class App extends Component {
                     <svg
                         width={600}
                         height={600}
-                    >
+                        >
                         <Node
-                            x={120}
-                            y={75}
+                            x={this.state.node.x}
+                            y={this.state.node.y}
                             width={200}
                             height={50}
                             name="Test node"
