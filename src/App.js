@@ -60,7 +60,15 @@ class Draggable extends Component {
 
     onMouseUp (e) {
         
-        this.setState({ dragging: false });
+        this.setState(
+            { dragging: false }, 
+            ()  => {
+                // State changes have finished.
+                if (this.props.onDragged) {
+                    this.props.onDragged(this.state.x, this.state.y);
+                }
+            }
+        );
 
         e.stopPropagation();
         e.preventDefault();
@@ -99,6 +107,7 @@ class Draggable extends Component {
 Draggable.propTypes = {
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
+    onDragged: PropTypes.func,
 };
 
 class Node extends Component {
@@ -114,6 +123,7 @@ class Node extends Component {
             <Draggable
                 x={x}
                 y={y}
+                onDragged={this.props.onDragged}
                 >
                 <rect
                     className="node-rect"
@@ -144,9 +154,21 @@ Node.propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
+    onDragged: PropTypes.func,
 };
 
 class App extends Component {
+    constructor(props) {
+        super(props);
+
+        // Interesting pattern for binding your events.
+        this.onDragged = this.onDragged.bind(this);
+    }
+
+    onDragged (x, y) {
+        console.log("onDragged: " + x + ", " + y);
+    }
+
     render() {
         return (
             <div className="App">
@@ -165,6 +187,7 @@ class App extends Component {
                             width={200}
                             height={50}
                             name="Test node"
+                            onDragged={this.onDragged}
                         />
                     </svg>
                 </div>
