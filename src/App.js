@@ -65,7 +65,7 @@ class Draggable extends Component {
             ()  => {
                 // State changes have finished.
                 if (this.props.onDragged) {
-                    this.props.onDragged(this.state.x, this.state.y);
+                    this.props.onDragged(this.props.id, this.state.x, this.state.y);
                 }
             }
         );
@@ -89,11 +89,12 @@ class Draggable extends Component {
     }
     
     render () {
-        const x = this.state.x;
-        const y = this.state.y;
+        const x = this.props.x;
+        const y = this.props.y;
+        const translate = `translate(${x}, ${y})`; //todo: inline this!
         return (
             <g
-                transform={`translate(${x}, ${y})`}
+                transform={translate}
                 onMouseDown={this.onMouseDown}
                 >
                 {this.props.children}
@@ -103,6 +104,7 @@ class Draggable extends Component {
 }
 
 Draggable.propTypes = {
+    id: PropTypes.number.isRequired,
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
     onDragged: PropTypes.func,
@@ -185,18 +187,14 @@ class Node extends Component {
     }
 
     render() {
-        const x = this.props.x;
-        const y = this.props.y;
-        const inputConnectors = this.props.inputConnectors;
-        const outputConnectors = this.props.outputConnectors;
         return (
             <Draggable
-                x={x}
-                y={y}
+                id={this.props.id}
+                x={this.props.x}
+                y={this.props.y}
                 onDragged={this.props.onDragged}
                 >
                 <rect
-                    className="node-rect"
                     ry="10"
                     rx="10"
                     x="0"
@@ -215,9 +213,23 @@ class Node extends Component {
                     {this.props.name}
                 </text>
 
-                {inputConnectors.map((inputConnector, index) => <InputConnector x={0} y={10 + (20*index)} name={inputConnector.name} />)}
+                {this.props.inputConnectors.map((inputConnector, index) => 
+                    <InputConnector 
+                        key={index}
+                        x={0} 
+                        y={10 + (20*index)} 
+                        name={inputConnector.name} 
+                        />
+                )}
 
-                {outputConnectors.map((outputConnector, index) => <OutputConnector x={this.props.width} y={10 + (20*index)} name={outputConnector.name} />)}
+                {this.props.outputConnectors.map((outputConnector, index) => 
+                    <OutputConnector 
+                        key={index}
+                        x={this.props.width} 
+                        y={10 + (20*index)} 
+                        name={outputConnector.name} 
+                        />
+                )}
 
             </Draggable>
         );
@@ -225,6 +237,7 @@ class Node extends Component {
 }
 
 Node.propTypes = {
+    id: PropTypes.number.isRequired,
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
@@ -241,72 +254,104 @@ class FlowchartEditor extends Component {
         super(props);
 
         this.state = {
-            node: {
-                x: 120,
-                y: 75,
-                inputConnectors: [
-                    {
-                        name: "Input 1",
-                    },
-                    {
-                        name: "Input 2",
-                    },
-                    {
-                        name: "Input 3",
-                    },
-                ],
-                outputConnectors: [
-                    {
-                        name: "Output 1",
-                    },
-                    {
-                        name: "Output 2",
-                    },
-                    {
-                        name: "Output 3",
-                    },
-                ],
-            },
+            nodes: [
+                {
+                    name: "Node 1",
+                    x: 120,
+                    y: 75,
+                    inputConnectors: [
+                        {
+                            name: "Input 1",
+                        },
+                        {
+                            name: "Input 2",
+                        },
+                        {
+                            name: "Input 3",
+                        },
+                    ],
+                    outputConnectors: [
+                        {
+                            name: "Output 1",
+                        },
+                        {
+                            name: "Output 2",
+                        },
+                        {
+                            name: "Output 3",
+                        },
+                    ],
+                },
+                {
+                    name: "Node 2",
+                    x: 320,
+                    y: 150,
+                    inputConnectors: [
+                        {
+                            name: "Input 1",
+                        },
+                        {
+                            name: "Input 2",
+                        },
+                        {
+                            name: "Input 3",
+                        },
+                    ],
+                    outputConnectors: [
+                        {
+                            name: "Output 1",
+                        },
+                        {
+                            name: "Output 2",
+                        },
+                        {
+                            name: "Output 3",
+                        },
+                    ],
+                },
+            ],
         };
 
         // Interesting pattern for binding your events.
         this.onDragged = this.onDragged.bind(this);
     }
     
-    onDragged (x, y) {
-        console.log("onDragged: " + x + ", " + y);
+    onDragged (id , x, y) {
+        console.log("onDragged: " + id + " -- " + x + ", " + y);
 
-        this.setState(
-            {
-                node: {
-                    ...this.state.node, // Preseve existing nested state using the spread operator. This is a bit wierd.
-                    x: x,
-                    y: y,
-                },
-            },
+        const newState = Object.assign({}, this.state);
+        const draggedNode = newState.nodes[id];
+        draggedNode.x = x;
+        draggedNode.y = y;
+        this.setState(newState,
             () => {
                 console.log("State updated finished");
                 console.log(this.state);
             }
         );
-        }
+    }
     
     render() {
-        return (
+        return ( // I like this pattern of using JS map function. It seems simpler than having a foreach stmt in the template language.
             <svg
                 width={this.props.width}
                 height={this.props.height}
                 >
-                <Node
-                    x={this.state.node.x}
-                    y={this.state.node.y}
-                    width={300}
-                    height={100}
-                    name="Test node"
-                    onDragged={this.onDragged}
-                    inputConnectors={this.state.node.inputConnectors}
-                    outputConnectors={this.state.node.outputConnectors}
-                />
+                
+                {this.state.nodes.map((node, index) => 
+                    <Node
+                        key={index}
+                        id={index}
+                        x={node.x}
+                        y={node.y}
+                        width={300}
+                        height={100}
+                        name={node.name}
+                        onDragged={this.onDragged}
+                        inputConnectors={node.inputConnectors}
+                        outputConnectors={node.outputConnectors}
+                    />
+                )}
             </svg>
         );
     }
@@ -315,7 +360,7 @@ class FlowchartEditor extends Component {
 FlowchartEditor.propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    nodes: PropTypes.array.isRequired,
+    //todo: nodes: PropTypes.array.isRequired,
 };
 
 class App extends Component {
@@ -333,8 +378,8 @@ class App extends Component {
                 </header>
                 <div>
                     <FlowchartEditor 
-                        width={600}
-                        height={600}
+                        width={window.innerWidth}
+                        height={window.innerHeight}
                         />
                 </div>
             </div>
