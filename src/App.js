@@ -16,7 +16,7 @@ class Draggable extends Component {
             x: this.props.x,
             y: this.props.y,
             dragging: false,
-            rel: null // position relative to the cursor
+            rel: null // The position relative to the cursor
         };
 
         this.onMouseDown = this.onMouseDown.bind(this);
@@ -89,12 +89,9 @@ class Draggable extends Component {
     }
     
     render () {
-        const x = this.props.x;
-        const y = this.props.y;
-        const translate = `translate(${x}, ${y})`; //todo: inline this!
         return (
             <g
-                transform={translate}
+                transform={`translate(${this.state.x}, ${this.state.y})`}
                 onMouseDown={this.onMouseDown}
                 >
                 {this.props.children}
