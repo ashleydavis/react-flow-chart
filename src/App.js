@@ -91,11 +91,9 @@ class Draggable extends Component {
     render () {
         const x = this.state.x;
         const y = this.state.y;
-        //TODO: Why can't I just include this directly in the DOM below???
-        const translate = `translate(${x}, ${y})`;
         return (
             <g
-                transform={translate}
+                transform={`translate(${x}, ${y})`}
                 onMouseDown={this.onMouseDown}
                 >
                 {this.props.children}
@@ -110,10 +108,80 @@ Draggable.propTypes = {
     onDragged: PropTypes.func,
 };
 
+class InputConnector extends Component {
+
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <g>
+                <text
+                    x={this.props.x + 12}
+                    y={this.props.y + 22}
+                    textAnchor="start"
+                    alignmentBaseline="middle"
+                    >
+                    {this.props.name}
+                </text>
+                <circle 
+                    cx={this.props.x+1}
+                    cy={this.props.y + 20}
+                    r="6"
+                    fill="white"
+                    stroke="black"
+                    />
+            </g>
+        );
+    }
+}
+
+InputConnector.propTypes = {
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+};
+
+class OutputConnector extends Component {
+
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <g>
+                <circle 
+                    cx={this.props.x}
+                    cy={this.props.y + 20}
+                    r="6"
+                    fill="white"
+                    stroke="black"
+                    />
+                <text
+                    x={this.props.x-12}
+                    y={this.props.y + 22}
+                    textAnchor="end"
+                    alignmentBaseline="middle"
+                    >
+                    {this.props.name}
+                </text>
+            </g>
+        );
+    }
+}
+
+OutputConnector.propTypes = {
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+};
+
 class Node extends Component {
 
     constructor(props) {
-        super(props)
+        super(props);
     }
 
     render() {
@@ -133,16 +201,26 @@ class Node extends Component {
                     y="0"
                     width={this.props.width}
                     height={this.props.height}
-                    fill="gray"
+                    fill="white"
+                    stroke="black"
                 />
                 <text
                     x={this.props.width / 2}
-                    y="25"
+                    y={this.props.height / 2}
                     textAnchor="middle"
                     alignmentBaseline="middle"
                     >
                     {this.props.name}
                 </text>
+
+                <InputConnector x={0} y={10} name="Input 1" alignment="start" />
+                <InputConnector x={0} y={30} name="Input 2" alignment="start" />
+                <InputConnector x={0} y={50} name="Input 3" alignment="start" />
+
+                <OutputConnector x={this.props.width} y={10} name="Output 1" alignment="end" />
+                <OutputConnector x={this.props.width} y={30} name="Output 2" alignment="end" />
+                <OutputConnector x={this.props.width} y={50} name="Output 3" alignment="end" />
+
             </Draggable>
         );
     }
@@ -205,8 +283,8 @@ class App extends Component {
                         <Node
                             x={this.state.node.x}
                             y={this.state.node.y}
-                            width={200}
-                            height={50}
+                            width={300}
+                            height={100}
                             name="Test node"
                             onDragged={this.onDragged}
                         />
