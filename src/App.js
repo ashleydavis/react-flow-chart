@@ -187,6 +187,8 @@ class Node extends Component {
     render() {
         const x = this.props.x;
         const y = this.props.y;
+        const inputConnectors = this.props.inputConnectors;
+        const outputConnectors = this.props.outputConnectors;
         return (
             <Draggable
                 x={x}
@@ -213,13 +215,9 @@ class Node extends Component {
                     {this.props.name}
                 </text>
 
-                <InputConnector x={0} y={10} name="Input 1" alignment="start" />
-                <InputConnector x={0} y={30} name="Input 2" alignment="start" />
-                <InputConnector x={0} y={50} name="Input 3" alignment="start" />
+                {inputConnectors.map((inputConnector, index) => <InputConnector x={0} y={10 + (20*index)} name={inputConnector.name} />)}
 
-                <OutputConnector x={this.props.width} y={10} name="Output 1" alignment="end" />
-                <OutputConnector x={this.props.width} y={30} name="Output 2" alignment="end" />
-                <OutputConnector x={this.props.width} y={50} name="Output 3" alignment="end" />
+                {outputConnectors.map((outputConnector, index) => <OutputConnector x={this.props.width} y={10 + (20*index)} name={outputConnector.name} />)}
 
             </Draggable>
         );
@@ -233,6 +231,8 @@ Node.propTypes = {
     height: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     onDragged: PropTypes.func,
+    inputConnectors: PropTypes.array.isRequired,
+    outputConnectors: PropTypes.array.isRequired,
 };
 
 class App extends Component {
@@ -243,6 +243,28 @@ class App extends Component {
             node: {
                 x: 120,
                 y: 75,
+                inputConnectors: [
+                    {
+                        name: "Input 1",
+                    },
+                    {
+                        name: "Input 2",
+                    },
+                    {
+                        name: "Input 3",
+                    },
+                ],
+                outputConnectors: [
+                    {
+                        name: "Output 1",
+                    },
+                    {
+                        name: "Output 2",
+                    },
+                    {
+                        name: "Output 3",
+                    },
+                ],
             },
         };
 
@@ -287,6 +309,8 @@ class App extends Component {
                             height={100}
                             name="Test node"
                             onDragged={this.onDragged}
+                            inputConnectors={this.state.node.inputConnectors}
+                            outputConnectors={this.state.node.outputConnectors}
                         />
                     </svg>
                 </div>
