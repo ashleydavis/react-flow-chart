@@ -235,7 +235,8 @@ Node.propTypes = {
     outputConnectors: PropTypes.array.isRequired,
 };
 
-class App extends Component {
+class FlowchartEditor extends Component {
+
     constructor(props) {
         super(props);
 
@@ -271,7 +272,7 @@ class App extends Component {
         // Interesting pattern for binding your events.
         this.onDragged = this.onDragged.bind(this);
     }
-
+    
     onDragged (x, y) {
         console.log("onDragged: " + x + ", " + y);
 
@@ -288,6 +289,39 @@ class App extends Component {
                 console.log(this.state);
             }
         );
+        }
+    
+    render() {
+        return (
+            <svg
+                width={this.props.width}
+                height={this.props.height}
+                >
+                <Node
+                    x={this.state.node.x}
+                    y={this.state.node.y}
+                    width={300}
+                    height={100}
+                    name="Test node"
+                    onDragged={this.onDragged}
+                    inputConnectors={this.state.node.inputConnectors}
+                    outputConnectors={this.state.node.outputConnectors}
+                />
+            </svg>
+        );
+    }
+}
+
+FlowchartEditor.propTypes = {
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    nodes: PropTypes.array.isRequired,
+};
+
+class App extends Component {
+
+    constructor(props) {
+        super(props);
     }
 
     render() {
@@ -298,21 +332,10 @@ class App extends Component {
                     <h1 className="App-title">Welcome to React</h1>
                 </header>
                 <div>
-                    <svg
+                    <FlowchartEditor 
                         width={600}
                         height={600}
-                        >
-                        <Node
-                            x={this.state.node.x}
-                            y={this.state.node.y}
-                            width={300}
-                            height={100}
-                            name="Test node"
-                            onDragged={this.onDragged}
-                            inputConnectors={this.state.node.inputConnectors}
-                            outputConnectors={this.state.node.outputConnectors}
                         />
-                    </svg>
                 </div>
             </div>
         );
