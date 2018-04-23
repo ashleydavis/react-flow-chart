@@ -251,6 +251,69 @@ class FlowchartEditor extends Component {
         super(props);
 
         this.state = {
+            nodes: this.props.nodes,
+        };
+
+        // Interesting pattern for binding your events.
+        this.onDragged = this.onDragged.bind(this);
+    }
+    
+    onDragged (id , x, y) {
+        console.log("onDragged: " + id + " -- " + x + ", " + y);
+
+        const newState = Object.assign({}, this.state);
+        const draggedNode = newState.nodes[id];
+        draggedNode.x = x;
+        draggedNode.y = y;
+        this.setState(newState,
+            () => {
+                console.log("State updated finished");
+                console.log(this.state);
+
+                this.props.onUpdated();
+            }
+        );
+    }
+    
+    render() {
+        return ( // I like this pattern of using JS map function. It seems simpler than having a foreach stmt in the template language.
+            <svg
+                width={this.props.width}
+                height={this.props.height}
+                >
+                
+                {this.state.nodes.map((node, index) => 
+                    <Node
+                        key={index}
+                        id={index}
+                        x={node.x}
+                        y={node.y}
+                        width={300}
+                        height={100}
+                        name={node.name}
+                        onDragged={this.onDragged}
+                        inputConnectors={node.inputConnectors}
+                        outputConnectors={node.outputConnectors}
+                    />
+                )}
+            </svg>
+        );
+    }
+}
+
+FlowchartEditor.propTypes = {
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    nodes: PropTypes.array.isRequired,
+    onUpdated: PropTypes.func,
+};
+
+class App extends Component {
+
+    constructor (props) {
+        super(props);
+
+        this.state = {
             nodes: [
                 {
                     name: "Node 1",
@@ -309,64 +372,14 @@ class FlowchartEditor extends Component {
             ],
         };
 
-        // Interesting pattern for binding your events.
-        this.onDragged = this.onDragged.bind(this);
-    }
-    
-    onDragged (id , x, y) {
-        console.log("onDragged: " + id + " -- " + x + ", " + y);
-
-        const newState = Object.assign({}, this.state);
-        const draggedNode = newState.nodes[id];
-        draggedNode.x = x;
-        draggedNode.y = y;
-        this.setState(newState,
-            () => {
-                console.log("State updated finished");
-                console.log(this.state);
-            }
-        );
-    }
-    
-    render() {
-        return ( // I like this pattern of using JS map function. It seems simpler than having a foreach stmt in the template language.
-            <svg
-                width={this.props.width}
-                height={this.props.height}
-                >
-                
-                {this.state.nodes.map((node, index) => 
-                    <Node
-                        key={index}
-                        id={index}
-                        x={node.x}
-                        y={node.y}
-                        width={300}
-                        height={100}
-                        name={node.name}
-                        onDragged={this.onDragged}
-                        inputConnectors={node.inputConnectors}
-                        outputConnectors={node.outputConnectors}
-                    />
-                )}
-            </svg>
-        );
-    }
-}
-
-FlowchartEditor.propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-    //todo: nodes: PropTypes.array.isRequired,
-};
-
-class App extends Component {
-
-    constructor(props) {
-        super(props);
+        this.onUpdated = this.onUpdated.bind(this);
     }
 
-    render() {
+    onUpdated () {
+        console.log("Flowchart updated.");
+    }
+
+    render () {
         return (
             <div className="App">
                 <header className="App-header">
@@ -377,6 +390,8 @@ class App extends Component {
                     <FlowchartEditor 
                         width={window.innerWidth}
                         height={window.innerHeight}
+                        nodes={this.state.nodes}
+                        onUpdated={this.onUpdated}
                         />
                 </div>
             </div>
