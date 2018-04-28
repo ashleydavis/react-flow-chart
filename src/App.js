@@ -302,6 +302,9 @@ class FlowchartEditor extends Component {
         );
     }
 
+    //
+    // Compute an SVG path for a connector between two nodes.
+    //
     computeConnectionPath(connection) {
 
         const sourceNode = this.sourceConnectorsMap[connection.source].node;
@@ -338,8 +341,8 @@ class FlowchartEditor extends Component {
                         id={index}
                         x={node.x}
                         y={node.y}
-                        width={300}
-                        height={100}
+                        width={node.width}
+                        height={node.height}
                         name={node.name}
                         onDragged={this.onDragged}
                         inputConnectors={node.inputConnectors}
@@ -383,6 +386,8 @@ class App extends Component {
                         name: "Node 1",
                         x: 120,
                         y: 75,
+                        width: 300,
+                        height: 100,
                         inputConnectors: [
                             {
                                 name: "Input 1",
@@ -410,6 +415,8 @@ class App extends Component {
                         name: "Node 2",
                         x: 620,
                         y: 150,
+                        width: 300,
+                        height: 100,
                         inputConnectors: [
                             {
                                 name: "Input 1",
