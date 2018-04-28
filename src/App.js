@@ -13,8 +13,6 @@ class Draggable extends Component {
         super(props);
 
         this.state = {
-            x: this.props.x,
-            y: this.props.y,
             dragging: false,
             rel: null // The position relative to the cursor
         };
@@ -49,8 +47,8 @@ class Draggable extends Component {
         this.setState({
             dragging: true,
             rel: {
-                x: e.pageX - this.state.x,
-                y: e.pageY - this.state.y
+                x: e.pageX - this.props.x,
+                y: e.pageY - this.props.y
             }
         });
 
@@ -60,16 +58,6 @@ class Draggable extends Component {
 
     onMouseUp (e) {
         
-        this.setState(
-            { dragging: false }, 
-            ()  => {
-                // State changes have finished.
-                if (this.props.onDragged) {
-                    this.props.onDragged(this.props.id, this.state.x, this.state.y);
-                }
-            }
-        );
-
         e.stopPropagation();
         e.preventDefault();
     }
@@ -79,10 +67,13 @@ class Draggable extends Component {
             return;
         }
 
-        this.setState({
-            x: e.pageX - this.state.rel.x,
-            y: e.pageY - this.state.rel.y
-        });
+       const x = e.pageX - this.state.rel.x;
+       const y = e.pageY - this.state.rel.y;
+
+       if (this.props.onDragged) {
+            this.props.onDragged(this.props.id, x, y);
+       }
+
 
         e.stopPropagation();
         e.preventDefault();
@@ -91,7 +82,7 @@ class Draggable extends Component {
     render () {
         return (
             <g
-                transform={`translate(${this.state.x}, ${this.state.y})`}
+                transform={`translate(${this.props.x}, ${this.props.y})`}
                 onMouseDown={this.onMouseDown}
                 >
                 {this.props.children}
@@ -125,6 +116,7 @@ class InputConnector extends Component {
                     alignmentBaseline="middle"
                     >
                     {this.props.name}
+                    {Math.random().toFixed(2)}
                 </text>
                 <circle 
                     cx={this.props.x}
@@ -169,6 +161,7 @@ class OutputConnector extends Component {
                     alignmentBaseline="middle"
                     >
                     {this.props.name}
+                    {Math.random().toFixed(2)}
                 </text>
             </g>
         );
@@ -212,6 +205,7 @@ class Node extends Component {
                     alignmentBaseline="middle"
                     >
                     {this.props.name}
+                    {Math.random().toFixed(2)}
                 </text>
 
                 {this.props.inputConnectors.map((inputConnector, index) => 
