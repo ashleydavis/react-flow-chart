@@ -214,7 +214,7 @@ class Node extends Component {
                     <InputConnector 
                         key={index}
                         x={0} 
-                        y={10 + (20*index)} 
+                        y={this.props.connectorPaddingTop + (this.props.connectorSpacing*index)} 
                         name={inputConnector.name} 
                         />
                 )}
@@ -223,7 +223,7 @@ class Node extends Component {
                     <OutputConnector 
                         key={index}
                         x={this.props.width} 
-                        y={10 + (20*index)} 
+                        y={this.props.connectorPaddingTop + (this.props.connectorSpacing*index)} 
                         name={outputConnector.name} 
                         />
                 )}
@@ -243,12 +243,17 @@ Node.propTypes = {
     onDragged: PropTypes.func,
     inputConnectors: PropTypes.array.isRequired,
     outputConnectors: PropTypes.array.isRequired,
+    connectorPaddingTop: PropTypes.number.isRequired,
+    connectorSpacing: PropTypes.number.isRequired,
 };
 
 class FlowchartEditor extends Component {
 
     constructor(props) {
         super(props);
+
+        this.connectorPaddingTop = 10;
+        this.connectorSpacing = 20;
 
         this.state = {
             flowchart: this.props.flowchart,
@@ -313,13 +318,13 @@ class FlowchartEditor extends Component {
         const destConnectorIndex = this.destConnectorsMap[connection.dest].index;
 
         const pt1 = {
-            x: sourceNode.x + 300, //todo: node width
-            y: sourceNode.y + 20 + 10 + (sourceConnectorIndex * 20),
+            x: sourceNode.x + sourceNode.width,
+            y: sourceNode.y + 20 + this.connectorPaddingTop + (sourceConnectorIndex * this.connectorSpacing),
         };
         
         const pt2 = {
             x: destNode.x,
-            y: destNode.y + 20 + 10 + (destConnectorIndex * 20),
+            y: destNode.y + 20 + this.connectorPaddingTop + (destConnectorIndex * this.connectorSpacing),
         };
 
         return "M " + pt1.x + " " + pt1.y + 
@@ -347,6 +352,9 @@ class FlowchartEditor extends Component {
                         onDragged={this.onDragged}
                         inputConnectors={node.inputConnectors}
                         outputConnectors={node.outputConnectors}
+                        connectorPaddingTop={this.connectorPaddingTop}
+                        connectorSpacing={this.connectorSpacing}
+                
                     />
                 )}
 
