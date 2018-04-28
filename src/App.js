@@ -114,19 +114,21 @@ class InputConnector extends Component {
     }
 
     render() {
+        const textPaddingLeft = 10;
+        const textPaddingTop = 1;
         return (
             <g>
                 <text
-                    x={this.props.x + 12}
-                    y={this.props.y + 22}
+                    x={this.props.x+textPaddingLeft}
+                    y={this.props.y+textPaddingTop}
                     textAnchor="start"
                     alignmentBaseline="middle"
                     >
                     {this.props.name}
                 </text>
                 <circle 
-                    cx={this.props.x + 1}
-                    cy={this.props.y + 20}
+                    cx={this.props.x}
+                    cy={this.props.y}
                     r="6"
                     fill="white"
                     stroke="black"
@@ -149,18 +151,20 @@ class OutputConnector extends Component {
     }
 
     render() {
+        const textPaddingRight = 10;
+        const textPaddingTop = 1;
         return (
             <g>
                 <circle 
                     cx={this.props.x}
-                    cy={this.props.y + 20}
+                    cy={this.props.y}
                     r="6"
                     fill="white"
                     stroke="black"
                     />
                 <text
-                    x={this.props.x-12}
-                    y={this.props.y + 22}
+                    x={this.props.x-textPaddingRight}
+                    y={this.props.y+textPaddingTop}
                     textAnchor="end"
                     alignmentBaseline="middle"
                     >
@@ -252,8 +256,8 @@ class FlowchartEditor extends Component {
     constructor(props) {
         super(props);
 
-        this.connectorPaddingTop = 10;
-        this.connectorSpacing = 20;
+        this.connectorPaddingTop = 25;
+        this.connectorSpacing = 21;
 
         this.state = {
             flowchart: this.props.flowchart,
@@ -280,11 +284,6 @@ class FlowchartEditor extends Component {
                 };
             })
         });
-
-        //fio:
-        console.log(this.nodesMap);
-        console.log(this.sourceConnectorsMap);
-        console.log(this.destConnectorsMap);
 
         // Interesting pattern for binding your events.
         this.onDragged = this.onDragged.bind(this);
@@ -319,12 +318,12 @@ class FlowchartEditor extends Component {
 
         const pt1 = {
             x: sourceNode.x + sourceNode.width,
-            y: sourceNode.y + 20 + this.connectorPaddingTop + (sourceConnectorIndex * this.connectorSpacing),
+            y: sourceNode.y + this.connectorPaddingTop + (sourceConnectorIndex * this.connectorSpacing),
         };
         
         const pt2 = {
             x: destNode.x,
-            y: destNode.y + 20 + this.connectorPaddingTop + (destConnectorIndex * this.connectorSpacing),
+            y: destNode.y + this.connectorPaddingTop + (destConnectorIndex * this.connectorSpacing),
         };
 
         return "M " + pt1.x + " " + pt1.y + 
