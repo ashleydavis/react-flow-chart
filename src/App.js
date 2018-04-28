@@ -274,12 +274,24 @@ class FlowchartEditor extends Component {
             }
         );
     }
-    
+
+    computeConnectionPath(pt1, pt2) {
+        return "M " + pt1.x + " " + pt1.y + 
+        " C " + (pt1.x + (pt2.x - pt1.x) / 2) + " " + pt1.y + ", " + 
+                (pt2.x - (pt2.x - pt1.x) / 2) + " " + pt2.y + ", " + 
+                pt2.x + " " + pt2.y;
+    }
+
     render() {
-        var x1 = 120 + 300;
-        var y1 = 75 + 10 + 20;
-        var x2 = 620;
-        var y2 = 150 + 10 + 20;
+        const p1 = {
+            x: 120 + 300,
+            y: 75 + 10 + 20
+        };
+        const p2 = {
+            x: 620,
+            y: 150 + 10 + 20,
+        };
+                
         return ( // I like this pattern of using JS map function. It seems simpler than having a foreach stmt in the template language.
             <svg
                 width={this.props.width}
@@ -302,8 +314,8 @@ class FlowchartEditor extends Component {
                 )}
 
                 <g>
-                    <path
-                        d={"M " + x1 + " " + y1 + " C " + (x1 + 10) + " " + (y1 + 10) + ", " + (x2-10) + " " + (y2-10) + ", " + x2 + " " + y2}
+                    <path 
+                        d={this.computeConnectionPath(p1, p2)}
                         stroke="black"
                         fill="transparent"
                         />
