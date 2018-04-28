@@ -125,7 +125,7 @@ class InputConnector extends Component {
                     {this.props.name}
                 </text>
                 <circle 
-                    cx={this.props.x+1}
+                    cx={this.props.x + 1}
                     cy={this.props.y + 20}
                     r="6"
                     fill="white"
@@ -251,8 +251,35 @@ class FlowchartEditor extends Component {
         super(props);
 
         this.state = {
-            nodes: this.props.nodes,
+            flowchart: this.props.flowchart,
         };
+
+        this.nodesMap = {};
+        this.sourceConnectorsMap = {};
+        this.destConnectorsMap = {};
+        this.state.flowchart.nodes.forEach(node => {
+            this.nodesMap[node.name] = node;
+            node.inputConnectors.forEach((inputConnector, index) => {
+                this.destConnectorsMap[node.name + "/" + inputConnector.name] = {
+                    node: node,
+                    connector: inputConnector,
+                    index: index,
+                };
+            })
+
+            node.outputConnectors.forEach((outputConnector, index) => {
+                this.sourceConnectorsMap[node.name + "/" + outputConnector.name] = {
+                    node: node,
+                    connector: outputConnector,
+                    index: index,
+                };
+            })
+        });
+
+        //fio:
+        console.log(this.nodesMap);
+        console.log(this.sourceConnectorsMap);
+        console.log(this.destConnectorsMap);
 
         // Interesting pattern for binding your events.
         this.onDragged = this.onDragged.bind(this);
@@ -262,7 +289,7 @@ class FlowchartEditor extends Component {
         console.log("onDragged: " + id + " -- " + x + ", " + y);
 
         const newState = Object.assign({}, this.state);
-        const draggedNode = newState.nodes[id];
+        const draggedNode = newState.flowchart.nodes[id];
         draggedNode.x = x;
         draggedNode.y = y;
         this.setState(newState,
@@ -275,30 +302,37 @@ class FlowchartEditor extends Component {
         );
     }
 
-    computeConnectionPath(pt1, pt2) {
+    computeConnectionPath(connection) {
+
+        const sourceNode = this.sourceConnectorsMap[connection.source].node;
+        const sourceConnectorIndex = this.sourceConnectorsMap[connection.source].index;
+        const destNode = this.destConnectorsMap[connection.dest].node;
+        const destConnectorIndex = this.destConnectorsMap[connection.dest].index;
+
+        const pt1 = {
+            x: sourceNode.x + 300, //todo: node width
+            y: sourceNode.y + 20 + 10 + (sourceConnectorIndex * 20),
+        };
+        
+        const pt2 = {
+            x: destNode.x,
+            y: destNode.y + 20 + 10 + (destConnectorIndex * 20),
+        };
+
         return "M " + pt1.x + " " + pt1.y + 
-        " C " + (pt1.x + (pt2.x - pt1.x) / 2) + " " + pt1.y + ", " + 
+            " C " + (pt1.x + (pt2.x - pt1.x) / 2) + " " + pt1.y + ", " + 
                 (pt2.x - (pt2.x - pt1.x) / 2) + " " + pt2.y + ", " + 
                 pt2.x + " " + pt2.y;
     }
 
-    render() {
-        const p1 = {
-            x: 120 + 300,
-            y: 75 + 10 + 20
-        };
-        const p2 = {
-            x: 620,
-            y: 150 + 10 + 20,
-        };
-                
+    render() {                
         return ( // I like this pattern of using JS map function. It seems simpler than having a foreach stmt in the template language.
             <svg
                 width={this.props.width}
                 height={this.props.height}
                 >
                 
-                {this.state.nodes.map((node, index) => 
+                {this.state.flowchart.nodes.map((node, index) => 
                     <Node
                         key={index}
                         id={index}
@@ -313,13 +347,18 @@ class FlowchartEditor extends Component {
                     />
                 )}
 
-                <g>
-                    <path 
-                        d={this.computeConnectionPath(p1, p2)}
-                        stroke="black"
-                        fill="transparent"
-                        />
-                </g>
+                {this.state.flowchart.connections.map((connection, index) =>
+                    <g
+                        key={index}
+                        >
+                        <path 
+                            d={this.computeConnectionPath(connection)}
+                            stroke="black"
+                            fill="transparent"
+                            />
+                    </g>
+                )}
+
             </svg>
         );
     }
@@ -328,7 +367,7 @@ class FlowchartEditor extends Component {
 FlowchartEditor.propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    nodes: PropTypes.array.isRequired,
+    flowchart: PropTypes.object.isRequired,
     onUpdated: PropTypes.func,
 };
 
@@ -338,62 +377,74 @@ class App extends Component {
         super(props);
 
         this.state = {
-            nodes: [
-                {
-                    name: "Node 1",
-                    x: 120,
-                    y: 75,
-                    inputConnectors: [
-                        {
-                            name: "Input 1",
-                        },
-                        {
-                            name: "Input 2",
-                        },
-                        {
-                            name: "Input 3",
-                        },
-                    ],
-                    outputConnectors: [
-                        {
-                            name: "Output 1",
-                        },
-                        {
-                            name: "Output 2",
-                        },
-                        {
-                            name: "Output 3",
-                        },
-                    ],
-                },
-                {
-                    name: "Node 2",
-                    x: 620,
-                    y: 150,
-                    inputConnectors: [
-                        {
-                            name: "Input 1",
-                        },
-                        {
-                            name: "Input 2",
-                        },
-                        {
-                            name: "Input 3",
-                        },
-                    ],
-                    outputConnectors: [
-                        {
-                            name: "Output 1",
-                        },
-                        {
-                            name: "Output 2",
-                        },
-                        {
-                            name: "Output 3",
-                        },
-                    ],
-                },
-            ],
+            flowchart: {
+                nodes: [
+                    {
+                        name: "Node 1",
+                        x: 120,
+                        y: 75,
+                        inputConnectors: [
+                            {
+                                name: "Input 1",
+                            },
+                            {
+                                name: "Input 2",
+                            },
+                            {
+                                name: "Input 3",
+                            },
+                        ],
+                        outputConnectors: [
+                            {
+                                name: "Output 1",
+                            },
+                            {
+                                name: "Output 2",
+                            },
+                            {
+                                name: "Output 3",
+                            },
+                        ],
+                    },
+                    {
+                        name: "Node 2",
+                        x: 620,
+                        y: 150,
+                        inputConnectors: [
+                            {
+                                name: "Input 1",
+                            },
+                            {
+                                name: "Input 2",
+                            },
+                            {
+                                name: "Input 3",
+                            },
+                        ],
+                        outputConnectors: [
+                            {
+                                name: "Output 1",
+                            },
+                            {
+                                name: "Output 2",
+                            },
+                            {
+                                name: "Output 3",
+                            },
+                        ],
+                    },
+                ],
+                connections: [
+                    {
+                        source: "Node 1/Output 1",
+                        dest: "Node 2/Input 1",
+                    },
+                    {
+                        source: "Node 1/Output 2",
+                        dest: "Node 2/Input 2",
+                    },
+                ],
+            },
         };
 
         this.onUpdated = this.onUpdated.bind(this);
@@ -414,7 +465,7 @@ class App extends Component {
                     <FlowchartEditor 
                         width={window.innerWidth}
                         height={window.innerHeight}
-                        nodes={this.state.nodes}
+                        flowchart={this.state.flowchart}
                         onUpdated={this.onUpdated}
                         />
                 </div>
