@@ -56,7 +56,9 @@ class Draggable extends Component {
     }
 
     onMouseUp (e) {
-        
+
+        this.setState({ dragging: false });
+
         e.stopPropagation();
         e.preventDefault();
     }
@@ -507,8 +509,8 @@ class App extends Component {
                     style={{
                         display: "flex", 
                         flexDirection: "column", 
-                        flexGrow: 1, 
-                        backgroundColor: "transparent"}}
+                        flexGrow: 1
+                    }}
                     >
                     <h1>Flowchart Editor</h1>
                     <FlowchartEditor 
