@@ -411,79 +411,82 @@ class App extends Component {
     constructor (props) {
         super(props);
 
+        const flowchart = {
+            nodes: [
+                {
+                    name: "Node 1",
+                    x: 120,
+                    y: 75,
+                    width: 300,
+                    height: 100,
+                    inputConnectors: [
+                        {
+                            name: "Input 1",
+                        },
+                        {
+                            name: "Input 2",
+                        },
+                        {
+                            name: "Input 3",
+                        },
+                    ],
+                    outputConnectors: [
+                        {
+                            name: "Output 1",
+                        },
+                        {
+                            name: "Output 2",
+                        },
+                        {
+                            name: "Output 3",
+                        },
+                    ],
+                },
+                {
+                    name: "Node 2",
+                    x: 620,
+                    y: 150,
+                    width: 300,
+                    height: 100,
+                    inputConnectors: [
+                        {
+                            name: "Input 1",
+                        },
+                        {
+                            name: "Input 2",
+                        },
+                        {
+                            name: "Input 3",
+                        },
+                    ],
+                    outputConnectors: [
+                        {
+                            name: "Output 1",
+                        },
+                        {
+                            name: "Output 2",
+                        },
+                        {
+                            name: "Output 3",
+                        },
+                    ],
+                },
+            ],
+            connections: [
+                {
+                    source: "Node 1/Output 1",
+                    dest: "Node 2/Input 1",
+                },
+                {
+                    source: "Node 1/Output 2",
+                    dest: "Node 2/Input 2",
+                },
+            ],
+        };
+    
         this.state = {
-            flowchart: {
-                nodes: [
-                    {
-                        name: "Node 1",
-                        x: 120,
-                        y: 75,
-                        width: 300,
-                        height: 100,
-                        inputConnectors: [
-                            {
-                                name: "Input 1",
-                            },
-                            {
-                                name: "Input 2",
-                            },
-                            {
-                                name: "Input 3",
-                            },
-                        ],
-                        outputConnectors: [
-                            {
-                                name: "Output 1",
-                            },
-                            {
-                                name: "Output 2",
-                            },
-                            {
-                                name: "Output 3",
-                            },
-                        ],
-                    },
-                    {
-                        name: "Node 2",
-                        x: 620,
-                        y: 150,
-                        width: 300,
-                        height: 100,
-                        inputConnectors: [
-                            {
-                                name: "Input 1",
-                            },
-                            {
-                                name: "Input 2",
-                            },
-                            {
-                                name: "Input 3",
-                            },
-                        ],
-                        outputConnectors: [
-                            {
-                                name: "Output 1",
-                            },
-                            {
-                                name: "Output 2",
-                            },
-                            {
-                                name: "Output 3",
-                            },
-                        ],
-                    },
-                ],
-                connections: [
-                    {
-                        source: "Node 1/Output 1",
-                        dest: "Node 2/Input 1",
-                    },
-                    {
-                        source: "Node 1/Output 2",
-                        dest: "Node 2/Input 2",
-                    },
-                ],
-            },
+            flowchart: flowchart,
+            flowchartJSON: JSON.stringify(flowchart, null, 4) // Capture flowchart JSON.
         };
 
         this.onUpdated = this.onUpdated.bind(this);
@@ -491,6 +494,11 @@ class App extends Component {
 
     onUpdated () {
         console.log("Flowchart updated.");
+
+        this.setState({
+            ...this.state, // Replicate existing state.
+            flowchartJSON: JSON.stringify(this.state.flowchart, null, 4) // Recapture flowchart JSON.
+        });
     }
 
     render () {
@@ -498,12 +506,11 @@ class App extends Component {
             <div style={{display: "flex", flexDirection: "row", height: "100vh"}}>
                 <div style={{display: "flex", flexDirection: "column", width: "600px"}}>
                     <h1>JSON flowchart</h1>
-                    <textarea 
+                    <pre
                         style={{display: "flex", flexGrow: 1}}
-                        value={JSON.stringify(this.state.flowchart, null, 4)}
                         >
-                        
-                    </textarea>
+                        {this.state.flowchartJSON}
+                    </pre>
                 </div>      
                 <div 
                     style={{
