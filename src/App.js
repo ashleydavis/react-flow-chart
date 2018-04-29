@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import PropTypes from 'prop-types';
 import './App.css';
 
@@ -328,49 +327,79 @@ class FlowchartEditor extends Component {
 
     render() {                
         return ( // I like this pattern of using JS map function. It seems simpler than having a foreach stmt in the template language.
-            <svg
-                width={this.props.width}
-                height={this.props.height}
+            <div 
+                style={{display: "flex", flexDirection: "column", flexGrow: 1}}
                 >
-                
-                {this.state.flowchart.nodes.map((node, index) => 
-                    <Node
-                        key={index}
-                        id={index}
-                        x={node.x}
-                        y={node.y}
-                        width={node.width}
-                        height={node.height}
-                        name={node.name}
-                        onDragged={this.onDragged}
-                        inputConnectors={node.inputConnectors}
-                        outputConnectors={node.outputConnectors}
-                        connectorPaddingTop={this.connectorPaddingTop}
-                        connectorSpacing={this.connectorSpacing}
-                
-                    />
-                )}
-
-                {this.state.flowchart.connections.map((connection, index) =>
-                    <g
-                        key={index}
+                <div
+                    style={{display: "flex", flexDirection: "row"}}
+                    >
+                    <button
+                        ng-click="addNewNode()"
+                        title="Add a new node to the chart"
                         >
-                        <path 
-                            d={this.computeConnectionPath(connection)}
-                            stroke="black"
-                            fill="transparent"
-                            />
-                    </g>
-                )}
+                        Add Node
+                    </button>
+                    <button
+                        ng-click="addNewInputConnector()"
+                        ng-disabled="chartViewModel.getSelectedNodes().length == 0"
+                        title="Add a new input connector to the selected node"
+                        >
+                        Add Input Connector
+                    </button>
+                    <button
+                        ng-click="addNewOutputConnector()"
+                        ng-disabled="chartViewModel.getSelectedNodes().length == 0"
+                        title="Add a new output connector to the selected node"
+                        >
+                        Add Output Connector
+                    </button>
+                    <button
+                        ng-click="deleteSelected()"
+                        ng-disabled="chartViewModel.getSelectedNodes().length == 0 && chartViewModel.getSelectedConnections().length == 0"
+                        title="Delete selected nodes and connections"
+                        >
+                        Delete Selected
+                    </button>
+                </div>
+                <svg style={{display: "flex", flexGrow: 1}}>
+                    
+                    {this.state.flowchart.nodes.map((node, index) => 
+                        <Node
+                            key={index}
+                            id={index}
+                            x={node.x}
+                            y={node.y}
+                            width={node.width}
+                            height={node.height}
+                            name={node.name}
+                            onDragged={this.onDragged}
+                            inputConnectors={node.inputConnectors}
+                            outputConnectors={node.outputConnectors}
+                            connectorPaddingTop={this.connectorPaddingTop}
+                            connectorSpacing={this.connectorSpacing}
+                    
+                        />
+                    )}
 
-            </svg>
+                    {this.state.flowchart.connections.map((connection, index) =>
+                        <g
+                            key={index}
+                            >
+                            <path 
+                                d={this.computeConnectionPath(connection)}
+                                stroke="black"
+                                fill="transparent"
+                                />
+                        </g>
+                    )}
+
+                </svg>
+            </div>
         );
     }
 }
 
 FlowchartEditor.propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
     flowchart: PropTypes.object.isRequired,
     onUpdated: PropTypes.func,
 };
@@ -464,18 +493,28 @@ class App extends Component {
 
     render () {
         return (
-            <div className="App">
-                <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <h1 className="App-title">Welcome to React</h1>
-                </header>
-                <div>
+            <div style={{display: "flex", flexDirection: "row", height: "100vh"}}>
+                <div style={{display: "flex", flexDirection: "column", width: "600px"}}>
+                    <h1>JSON flowchart</h1>
+                    <textarea 
+                        style={{display: "flex", flexGrow: 1}}
+                        value={JSON.stringify(this.state.flowchart, null, 4)}
+                        >
+                        
+                    </textarea>
+                </div>      
+                <div 
+                    style={{
+                        display: "flex", 
+                        flexDirection: "column", 
+                        flexGrow: 1, 
+                        backgroundColor: "transparent"}}
+                    >
+                    <h1>Flowchart Editor</h1>
                     <FlowchartEditor 
-                        width={window.innerWidth}
-                        height={window.innerHeight}
                         flowchart={this.state.flowchart}
                         onUpdated={this.onUpdated}
-                        />
+                        />  
                 </div>
             </div>
         );
