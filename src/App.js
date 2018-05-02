@@ -117,6 +117,7 @@ class InputConnector extends Component {
                     alignmentBaseline="middle"
                     >
                     {this.props.name}
+                    {" - "}
                     {Math.random().toFixed(2)}
                 </text>
                 <circle 
@@ -162,6 +163,7 @@ class OutputConnector extends Component {
                     alignmentBaseline="middle"
                     >
                     {this.props.name}
+                    {" - "}
                     {Math.random().toFixed(2)}
                 </text>
             </g>
@@ -199,6 +201,7 @@ class Node extends Component {
                     fill="white"
                     stroke="black"
                 />
+
                 <text
                     x={this.props.width / 2}
                     y={this.props.height / 2}
@@ -206,6 +209,7 @@ class Node extends Component {
                     alignmentBaseline="middle"
                     >
                     {this.props.name}
+                    {" - "}
                     {Math.random().toFixed(2)}
                 </text>
 
@@ -327,7 +331,7 @@ class FlowchartEditor extends Component {
                 pt2.x + " " + pt2.y;
     }
 
-    render() {                
+    render() {             
         return ( // I like this pattern of using JS map function. It seems simpler than having a foreach stmt in the template language.
             <div 
                 style={{display: "flex", flexDirection: "column", flexGrow: 1}}
@@ -417,7 +421,7 @@ class App extends Component {
                     name: "Node 1",
                     x: 120,
                     y: 75,
-                    width: 300,
+                    width: 400,
                     height: 100,
                     inputConnectors: [
                         {
@@ -446,7 +450,7 @@ class App extends Component {
                     name: "Node 2",
                     x: 620,
                     y: 150,
-                    width: 300,
+                    width: 400,
                     height: 100,
                     inputConnectors: [
                         {
@@ -490,14 +494,30 @@ class App extends Component {
         };
 
         this.onUpdated = this.onUpdated.bind(this);
+        this.onFlowchartJsonChange = this.onFlowchartJsonChange.bind(this);
     }
 
+    //
+    // Flowchart has been edited, update the JSON view.
+    //
     onUpdated () {
-        console.log("Flowchart updated.");
+        this.setState({
+            ...this.state, // Replicate existing state. This is awesome, JavaScript spread operator.
+            flowchartJSON: JSON.stringify(this.state.flowchart, null, 4) // Recapture flowchart JSON.
+        });
+    }
+
+    //
+    // The flowchart's JSON definition has changed, update the visual flowchart.
+    //
+    onFlowchartJsonChange (event) {
+
+        const flowchartJSON = event.target.value;
 
         this.setState({
-            ...this.state, // Replicate existing state.
-            flowchartJSON: JSON.stringify(this.state.flowchart, null, 4) // Recapture flowchart JSON.
+            ...this.state,
+            flowchartJSON: flowchartJSON,
+            flowchart: JSON.parse(flowchartJSON),
         });
     }
 
@@ -506,11 +526,11 @@ class App extends Component {
             <div style={{display: "flex", flexDirection: "row", height: "100vh"}}>
                 <div style={{display: "flex", flexDirection: "column", width: "600px"}}>
                     <h1>JSON flowchart</h1>
-                    <pre
+                    <textarea
                         style={{display: "flex", flexGrow: 1}}
-                        >
-                        {this.state.flowchartJSON}
-                    </pre>
+                        value={this.state.flowchartJSON}
+                        onChange={this.onFlowchartJsonChange}
+                        />
                 </div>      
                 <div 
                     style={{
